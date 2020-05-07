@@ -1,10 +1,11 @@
-copy ..\target\server-1.0.jar photo_server.jar
+copy ..\target\server-1.0.jar PhotoServer.jar
 
-photo_server.exe ^
-//IS//PhotoServer ^
---Install="%~dp0photo_server.exe" ^
+PhotoServer.exe ^
+//IS ^
+--Install="%~dp0PhotoServer.exe" ^
+--DisplayName="Photo Server" ^
 --Jvm=auto ^
---Classpath="%~dp0photo_server.jar" ^
+--Classpath="%~dp0PhotoServer.jar" ^
 --Startup=auto ^
 --StartMode=jvm ^
 --StartClass=pm.photos.server.PhotoServerApp ^

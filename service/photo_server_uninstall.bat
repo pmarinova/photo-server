@@ -1,2 +1,2 @@
-photo_server.exe //DS//PhotoServer 
+PhotoServer.exe //DS 
 pause
