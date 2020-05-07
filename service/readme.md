@@ -5,8 +5,7 @@ The PhotoServer can be installed as a Windows service using the Apache Commons D
 
 To install the PhotoServer service:
 1. Build the project with **mvn clean package**
-2. Copy **target/server-1.0.jar** to **service/PhotoServer.jar**
-3. From the **service** directory, run **service_install.bat**
+2. From the **service** directory, run **service_install.bat**
 
 To uninstall the PhotoServer service:
 1. Stop the service
