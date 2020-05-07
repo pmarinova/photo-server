@@ -12,7 +12,7 @@ To uninstall the PhotoServer service:
 2. Run **service/service_uninstall.bat**
 
 Double-click **PhotoServerw.exe** to manage the service after it is installed.
-
+Setup the path to the photos directory by replacing _path_to_photos_dir_ in **Startup > Arguments** with the desired path, e.g. _D:\MyPhotos_.
 
 
 Apache Commons Daemon binaries

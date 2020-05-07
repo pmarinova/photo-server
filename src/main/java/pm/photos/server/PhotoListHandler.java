@@ -48,7 +48,12 @@ public class PhotoListHandler implements HttpHandler {
 	
 	private URL getURL(Path path) {
 		try {
-			return new URL(this.baseURL, path.toString().replace("\\", "/"));
+			Path relativePath = this.photosPath.relativize(path);
+			return new URL(
+				this.baseURL.getProtocol(), 
+				this.baseURL.getHost(),
+				this.baseURL.getPort(),
+				this.baseURL.getFile() + "/" + relativePath.toString().replace("\\", "/"));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}

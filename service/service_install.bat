@@ -15,7 +15,8 @@ PhotoServer.exe ^
 --LogPrefix="photo-server" ^
 --LogLevel=Debug ^
 --StdOutput="%~dp0logs\stdout.log" ^
---StdError="%~dp0logs\stderr.log"
+--StdError="%~dp0logs\stderr.log" ^
+++StartParams="path_to_photos_dir"
 
   
 pause

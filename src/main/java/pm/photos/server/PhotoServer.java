@@ -3,7 +3,6 @@ package pm.photos.server;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -16,7 +15,7 @@ public class PhotoServer {
 	
 	private final int port;
 	
-	private Path photosPath = Paths.get("photos");
+	private Path photosPath;
 	
 	private Undertow undertow;
 	
@@ -38,7 +37,7 @@ public class PhotoServer {
 		this.undertow = Undertow.builder()
 			.addHttpListener(this.port, this.host)
 			.setHandler(Handlers.path()
-				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getBaseURL()))
+				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getURL("/photos")))
 				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath))
 			).build();
 		
@@ -49,9 +48,9 @@ public class PhotoServer {
 		this.undertow.stop();
 	}
 	
-	private URL getBaseURL() {
+	private URL getURL(String file) {
 		try {
-			return new URL("http", this.host, this.port, "");
+			return new URL("http", this.host, this.port, file);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
