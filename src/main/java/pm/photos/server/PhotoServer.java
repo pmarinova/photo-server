@@ -3,6 +3,7 @@ package pm.photos.server;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -10,38 +11,42 @@ import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 
 public class PhotoServer {
-	
-	private int port;
 
-	private String host;
+	private final String host;
 	
-	private Path photosPath;
+	private final int port;
 	
-	public PhotoServer withPort(int port) {
-		this.port = port;
-		return this;
-	}
+	private Path photosPath = Paths.get("photos");
 	
-	public PhotoServer withHost(String host) {
+	private Undertow undertow;
+	
+	public PhotoServer (String host, int port) {
 		this.host = host;
-		return this;
+		this.port = port;
 	}
 	
-	public PhotoServer withPhotosPath(Path photosPath) {
+	public Path getPhotosPath() {
+		return this.photosPath;
+	}
+	
+	public void setPhotosPath(Path photosPath) {
 		this.photosPath = photosPath;
-		return this;
 	}
 	
 	public void start() {
 		
-		Undertow.builder()
+		this.undertow = Undertow.builder()
 			.addHttpListener(this.port, this.host)
 			.setHandler(Handlers.path()
 				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getBaseURL()))
 				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath))
-			)
-			.build()
-			.start();
+			).build();
+		
+		this.undertow.start();
+	}
+	
+	public void stop() {
+		this.undertow.stop();
 	}
 	
 	private URL getBaseURL() {
