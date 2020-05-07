@@ -3,4 +3,5 @@
 .project
 target
 dependency-reduced-pom.xml
-service/photo_server.jar
+service/*.jar
+service/*.log
