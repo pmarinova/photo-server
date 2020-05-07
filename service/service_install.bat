@@ -10,7 +10,12 @@ PhotoServer.exe ^
 --StartMethod=start ^
 --StopMode=jvm ^
 --StopClass=pm.photos.server.PhotoServerApp ^
---StopMethod=stop
+--StopMethod=stop ^
+--LogPath="%~dp0logs" ^
+--LogPrefix="photo-server" ^
+--LogLevel=Debug ^
+--StdOutput="%~dp0logs\stdout.log" ^
+--StdError="%~dp0logs\stderr.log"
 
   
 pause
