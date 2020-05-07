@@ -1,5 +1,3 @@
-copy ..\target\server-1.0.jar PhotoServer.jar
-
 PhotoServer.exe ^
 //IS ^
 --Install="%~dp0PhotoServer.exe" ^
