@@ -1,7 +1,10 @@
 package pm.photos.server;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 
+import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
@@ -31,13 +34,27 @@ public class PhotoServer {
 	
 	public void start() {
 		
-		ResourceHandler photosHandler = new ResourceHandler(new PathResourceManager(this.photosPath));
-		photosHandler.setDirectoryListingEnabled(true);
-		
 		Undertow.builder()
 			.addHttpListener(this.port, this.host)
-			.setHandler(photosHandler)
+			.setHandler(Handlers.path()
+				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getBaseURL()))
+				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath))
+			)
 			.build()
 			.start();
+	}
+	
+	private URL getBaseURL() {
+		try {
+			return new URL("http", this.host, this.port, "");
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private ResourceHandler newPhotoResourceHandler(Path photosPath) {
+		ResourceHandler handler = new ResourceHandler(new PathResourceManager(photosPath));
+		handler.setDirectoryListingEnabled(true);
+		return handler;
 	}
 }
