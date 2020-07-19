@@ -5,3 +5,5 @@ target
 dependency-reduced-pom.xml
 service/*.jar
 service/logs
+java*.log
+java*.log.lck

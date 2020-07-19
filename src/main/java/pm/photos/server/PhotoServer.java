@@ -3,13 +3,18 @@ package pm.photos.server;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.logging.Logger;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 
 public class PhotoServer {
+	
+	private static final Logger LOGGER = Logger.getLogger(PhotoServer.class.getName());
 
 	private final String host;
 	
@@ -34,12 +39,17 @@ public class PhotoServer {
 	
 	public void start() {
 		
+		HttpHandler rootHandler = Handlers.path()
+				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getURL("/photos")))
+				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath));
+		
+		HttpHandler logHandler = new AccessLogHandler(rootHandler,
+				message -> LOGGER.info(message), "common", PhotoServer.class.getClassLoader()); 
+		
 		this.undertow = Undertow.builder()
 			.addHttpListener(this.port, this.host)
-			.setHandler(Handlers.path()
-				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getURL("/photos")))
-				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath))
-			).build();
+			.setHandler(logHandler)
+			.build();
 		
 		this.undertow.start();
 	}

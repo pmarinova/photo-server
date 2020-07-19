@@ -1,15 +1,21 @@
 package pm.photos.server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
 public class PhotoServerApp {
+	
+	private static Logger LOGGER = configureLogger();
 	
 	private static JmDNS jmdns;
 	private static PhotoServer server;
@@ -40,7 +46,7 @@ public class PhotoServerApp {
 			server.start();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			stop(args);
 		}
 	}
@@ -69,6 +75,15 @@ public class PhotoServerApp {
 		try (final DatagramSocket socket = new DatagramSocket()) {
 			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 			return socket.getLocalAddress();
+		}
+	}
+	
+	private static Logger configureLogger() {		
+		try (InputStream config = PhotoServerApp.class.getResourceAsStream("/logging.properties")) {
+			LogManager.getLogManager().readConfiguration(config);
+			return Logger.getLogger(PhotoServerApp.class.getName());
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to configure logger", e);
 		}
 	}
 }
