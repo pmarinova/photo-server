@@ -43,7 +43,7 @@ public class PhotoListHandler implements HttpHandler {
 
 	private boolean isImageFile(Path path) {
 		File file = path.toFile();
-		return file.isFile() && file.getName().endsWith(".jpg");
+		return file.isFile() && file.getName().matches("(?i).*\\.jpg$");
 	}
 	
 	private URL getURL(Path path) {
