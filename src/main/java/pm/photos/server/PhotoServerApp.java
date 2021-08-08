@@ -30,7 +30,7 @@ public class PhotoServerApp {
 				
 		try {
 			final String host = "0.0.0.0";
-			final int port = 9090;
+			final int port = 40003;
 			
 			String serviceType = "_photoserver._tcp.local";
 			String serviceName = InetAddress.getLocalHost().getHostName();
