@@ -2,7 +2,6 @@ package pm.photos.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,15 +29,14 @@ public class PhotoServerApp {
 				Paths.get(args[0]) : Paths.get("photos");
 				
 		try {
-			final InetAddress address = getDefaultLocalAddress();
-			final String host = address.getHostAddress();
+			final String host = "0.0.0.0";
 			final int port = 9090;
 			
 			String serviceType = "_photoserver._tcp.local";
 			String serviceName = InetAddress.getLocalHost().getHostName();
 			String serviceDescription = "Photo server service";
 			ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceDescription);
-			jmdns = JmDNS.create(address);
+			jmdns = JmDNS.create(InetAddress.getByName(host));
 			jmdns.registerService(serviceInfo);
 			
 			server = new PhotoServer(host, port);
@@ -59,22 +57,6 @@ public class PhotoServerApp {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	
-	/*
-	 *  Returns the host local address associated with the preferred network interface.
-	 *  
-	 *  The problem is that a host could have lots of network interfaces, and an interface
-	 *  could be bound to more than one IP address. And to top that, not all IP addresses 
-	 *  will be reachable outside of your machine or your LAN. For example, they could be
-	 *  IP addresses for virtual network devices, private network IP addresses, and so on.
-	 *  See https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
-	 */
-	private static InetAddress getDefaultLocalAddress() throws IOException {
-		try (final DatagramSocket socket = new DatagramSocket()) {
-			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-			return socket.getLocalAddress();
 		}
 	}
 	
