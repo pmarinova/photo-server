@@ -1,7 +1,5 @@
 package pm.photos.server;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -40,7 +38,7 @@ public class PhotoServer {
 	public void start() {
 		
 		HttpHandler rootHandler = Handlers.path()
-				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath, getURL("/photos")))
+				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath))
 				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath));
 		
 		HttpHandler logHandler = new AccessLogHandler(rootHandler,
@@ -56,14 +54,6 @@ public class PhotoServer {
 	
 	public void stop() {
 		this.undertow.stop();
-	}
-	
-	private URL getURL(String file) {
-		try {
-			return new URL("http", this.host, this.port, file);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	private ResourceHandler newPhotoResourceHandler(Path photosPath) {

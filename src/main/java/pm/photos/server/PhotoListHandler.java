@@ -1,8 +1,6 @@
 package pm.photos.server;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -22,19 +20,16 @@ public class PhotoListHandler implements HttpHandler {
 	
 	private final Path photosPath;
 	
-	private final URL baseURL;
-	
-	public PhotoListHandler(Path photosPath, URL baseURL) {
+	public PhotoListHandler(Path photosPath) {
 		this.photosPath = photosPath;
-		this.baseURL = baseURL;
 	}
 
 	@Override
 	public void handleRequest(HttpServerExchange exchange) throws Exception {
 		
-		List<URL> photos = Files.walk(this.photosPath)
+		List<String> photos = Files.walk(this.photosPath)
 				.filter(this::isImageFile)
-				.map(this::getURL)
+				.map(this::getRelativePath)
 				.collect(Collectors.toList());
 		
 		exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
@@ -46,16 +41,8 @@ public class PhotoListHandler implements HttpHandler {
 		return file.isFile() && file.getName().matches("(?i).*\\.jpg$");
 	}
 	
-	private URL getURL(Path path) {
-		try {
-			Path relativePath = this.photosPath.relativize(path);
-			return new URL(
-				this.baseURL.getProtocol(), 
-				this.baseURL.getHost(),
-				this.baseURL.getPort(),
-				this.baseURL.getFile() + "/" + relativePath.toString().replace("\\", "/"));
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+	private String getRelativePath(Path path) {
+		Path relativePath = this.photosPath.relativize(path);
+		return relativePath.toString().replace("\\", "/");
 	}
 }
