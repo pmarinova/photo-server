@@ -110,7 +110,7 @@ public class PhotoServerApp {
 		}
 	}
 	
-	private static Logger configureLogger() {		
+	private static Logger configureLogger() {
 		try (InputStream config = PhotoServerApp.class.getResourceAsStream("/logging.properties")) {
 			LogManager.getLogManager().readConfiguration(config);
 			return Logger.getLogger(PhotoServerApp.class.getName());

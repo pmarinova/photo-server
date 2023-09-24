@@ -115,6 +115,10 @@
               <metadataRepository>
                 <enabled>true</enabled>
               </metadataRepository>
+              <buildArgs>
+                <arg>-H:ReflectionConfigurationFiles=${project.basedir}/reflectconfig.json</arg>
+                <arg>--initialize-at-build-time=pm.photos.server.PhotoServerApp</arg>
+              </buildArgs>
             </configuration>
           </plugin>
         </plugins>
