@@ -52,11 +52,11 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -91,6 +91,31 @@
       
     </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <version>0.9.27</version>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>build-native</id>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
   
 </project>
