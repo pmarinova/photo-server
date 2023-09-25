@@ -66,8 +66,8 @@ public class PhotoServerApp {
 			
 			startServer(photosDir, serverHost, serverPort);
 			
-		} catch (ParseException ex) {
-			System.out.println(ex.getMessage() + "\n");
+		} catch (ParseException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage());
 			new HelpFormatter().printHelp("photo-server", options, true);
 			System.exit(1);
 		}
@@ -81,11 +81,11 @@ public class PhotoServerApp {
 			server = new PhotoServer(host, port);
 			server.setPhotosPath(photosPath);
 			server.start();
-			System.out.println(String.format("Server started at %s:%d", host, port));
+			LOGGER.log(Level.INFO, String.format("Server started at %s:%d", host, port));
 			
 			jmdns = new PhotoServerJmDNS(host, port);
 			jmdns.start();
-			System.out.println("mDNS service started");
+			LOGGER.log(Level.INFO, "mDNS service started");
 		}
 		catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -100,10 +100,10 @@ public class PhotoServerApp {
 	public static void stopServer() {
 		try {
 			jmdns.stop();
-			System.out.println("mDNS service stopped");
+			LOGGER.log(Level.INFO, "mDNS service stopped");
 			
 			server.stop();
-			System.out.println("Server stopped");
+			LOGGER.log(Level.INFO, "Server stopped");
 		}
 		catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
