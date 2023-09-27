@@ -64,8 +64,6 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>PhotoServer</finalName>
-              <outputDirectory>service</outputDirectory>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>pm.photos.server.PhotoServerApp</mainClass>

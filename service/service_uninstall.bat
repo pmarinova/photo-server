@@ -1,2 +1,0 @@
-PhotoServer.exe //DS 
-pause

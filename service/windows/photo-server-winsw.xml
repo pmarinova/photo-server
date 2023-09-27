@@ -1,0 +1,10 @@
+<service>
+  
+  <id>photo-server</id>
+  <name>Photo Server</name>
+  <description>Simple photo server to be used by photo screensaver for Android TV</description>
+  
+  <executable>%BASE%\photo-server.exe</executable>
+  <arguments>-d "%BASE%\photos" -p 40003</arguments>
+
+</service>
