@@ -31,7 +31,6 @@ public class PhotoServerApp {
 		Option optPhotosDir = Option
 				.builder("d")
 				.longOpt("photos_dir")
-				.required(true)
 				.hasArg(true)
 				.argName("PHOTOS_DIR")
 				.desc("path to the photos directory which will be served")
@@ -60,7 +59,7 @@ public class PhotoServerApp {
 		
 		try {
 			CommandLine cmdLine = new DefaultParser().parse(options, args);
-			String photosDir = cmdLine.getOptionValue(optPhotosDir.getOpt());
+			String photosDir = cmdLine.getOptionValue(optPhotosDir.getOpt(), "photos");
 			String serverHost = cmdLine.getOptionValue(optServerHost.getOpt(), "0.0.0.0");
 			int serverPort = Integer.parseInt(cmdLine.getOptionValue(optServerPort.getOpt(), "40003"));
 			
@@ -76,6 +75,7 @@ public class PhotoServerApp {
 	public static void startServer(String photosDir, String host, int port) {
 		
 		Path photosPath = Paths.get(photosDir);
+		LOGGER.log(Level.INFO, String.format("Serving photos from path '%s'", photosPath.toAbsolutePath()));
 				
 		try {
 			server = new PhotoServer(host, port);
