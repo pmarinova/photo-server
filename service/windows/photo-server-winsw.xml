@@ -3,4 +3,12 @@
   <name>Photo Server</name>
   <description>Simple photo server to be used by photo screensaver for Android TV</description>
   <executable>%BASE%\photo-server.exe</executable>
+  <!--
+    By default the photo server uses the 'photos' directory relative to the executable.
+	If you'd like to specify another path for the photos, uncomment the 'arguments' tag
+	below and replace <PHOTOS_DIR> with your photos directory path.
+  -->
+  <!--
+  <arguments>--photos_dir <PHOTOS_DIR></arguments>
+  -->
 </service>
