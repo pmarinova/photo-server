@@ -9,6 +9,6 @@
 	below and replace <PHOTOS_DIR> with your photos directory path.
   -->
   <!--
-  <arguments>--photos_dir <PHOTOS_DIR></arguments>
+  <arguments>-d <PHOTOS_DIR></arguments>
   -->
 </service>

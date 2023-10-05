@@ -9,4 +9,4 @@ To uninstall the photo server service:
 
 
 To set the path to the photos directory you need to edit the file 'photo-server-winsw.xml'.
-Uncomment the 'arguments' tag and specify the photos path by setting the '--photos_dir' option.
+Uncomment the 'arguments' tag and specify the photos path by setting the '-d' option.
