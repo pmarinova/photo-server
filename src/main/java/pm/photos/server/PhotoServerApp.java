@@ -19,14 +19,33 @@ public class PhotoServerApp {
 	
 	private static Logger LOGGER = configureLogger();
 	
-	private static PhotoServerJmDNS jmdns;
-	private static PhotoServer server;
-	
-	public static void main(String[] args) {
-		start(args);
+	private static Logger configureLogger() {
+		// See https://stackoverflow.com/a/13825590
+        System.setProperty("java.util.logging.manager", CustomLogManager.class.getName());
+		try (InputStream config = PhotoServerApp.class.getResourceAsStream("/logging.properties")) {
+			LogManager.getLogManager().readConfiguration(config);
+			return Logger.getLogger(PhotoServerApp.class.getName());
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to configure logger", e);
+		}
 	}
 	
-	public static void start(String[] args) {
+	public static class CustomLogManager extends LogManager {
+        static CustomLogManager instance;
+        public CustomLogManager() { instance = this; }
+        @Override public void reset() { /* don't reset yet. */ }
+        private void reset0() { super.reset(); }
+        public static void resetFinally() { instance.reset0(); }
+    }
+
+	private final Path photosPath;
+	private final String serverHost;
+	private final int serverPort;
+	
+	private PhotoServer server;
+	private PhotoServerJmDNS jmdns;
+	
+	public static void main(String[] args) {
 		
 		Option optPhotosDir = Option
 				.builder("d")
@@ -63,7 +82,14 @@ public class PhotoServerApp {
 			String serverHost = cmdLine.getOptionValue(optServerHost.getOpt(), "0.0.0.0");
 			int serverPort = Integer.parseInt(cmdLine.getOptionValue(optServerPort.getOpt(), "40003"));
 			
-			startServer(photosDir, serverHost, serverPort);
+			PhotoServerApp photoServer = new PhotoServerApp(Paths.get(photosDir), serverHost, serverPort);
+			photoServer.start();
+			
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				LOGGER.log(Level.INFO, "Shutting down...");
+				try { photoServer.stop(); }
+				finally { CustomLogManager.resetFinally(); }
+			}));
 			
 		} catch (ParseException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage());
@@ -72,50 +98,44 @@ public class PhotoServerApp {
 		}
 	}
 	
-	public static void startServer(String photosDir, String host, int port) {
-		
-		Path photosPath = Paths.get(photosDir);
-		LOGGER.log(Level.INFO, String.format("Serving photos from path '%s'", photosPath.toAbsolutePath()));
-				
+	PhotoServerApp(Path photosPath, String serverHost, int serverPort) {
+		this.photosPath = photosPath;
+		this.serverHost = serverHost;
+		this.serverPort = serverPort;
+	}
+	
+	void start() {
 		try {
-			server = new PhotoServer(host, port);
+			LOGGER.log(Level.INFO, String.format("Serving photos from path '%s'", photosPath.toAbsolutePath()));
+			
+			server = new PhotoServer(serverHost, serverPort);
 			server.setPhotosPath(photosPath);
 			server.start();
-			LOGGER.log(Level.INFO, String.format("Server started at %s:%d", host, port));
+			LOGGER.log(Level.INFO, String.format("Server started at %s:%d", serverHost, serverPort));
 			
-			jmdns = new PhotoServerJmDNS(host, port);
+			jmdns = new PhotoServerJmDNS(serverHost, serverPort);
 			jmdns.start();
 			LOGGER.log(Level.INFO, "mDNS service started");
 		}
 		catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-			stopServer();
 		}
 	}
 	
-	public static void stop(String[] args) {
-		stopServer();
-	}
-	
-	public static void stopServer() {
+	void stop() {
 		try {
-			jmdns.stop();
-			LOGGER.log(Level.INFO, "mDNS service stopped");
+			if (jmdns != null) {
+				jmdns.stop();
+				LOGGER.log(Level.INFO, "mDNS service stopped");
+			}
 			
-			server.stop();
-			LOGGER.log(Level.INFO, "Server stopped");
+			if (server != null) {
+				server.stop();
+				LOGGER.log(Level.INFO, "Server stopped");
+			}
 		}
 		catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		}
-	}
-	
-	private static Logger configureLogger() {
-		try (InputStream config = PhotoServerApp.class.getResourceAsStream("/logging.properties")) {
-			LogManager.getLogManager().readConfiguration(config);
-			return Logger.getLogger(PhotoServerApp.class.getName());
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to configure logger", e);
 		}
 	}
 }

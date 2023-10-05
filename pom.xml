@@ -109,6 +109,7 @@
           <buildArgs>
             <arg>-H:ReflectionConfigurationFiles=${project.basedir}/reflectconfig.json</arg>
             <arg>--initialize-at-build-time=pm.photos.server.PhotoServerApp</arg>
+            <arg>--install-exit-handlers</arg>
           </buildArgs>
         </configuration>
       </plugin>
