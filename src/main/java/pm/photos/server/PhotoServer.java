@@ -1,7 +1,9 @@
 package pm.photos.server;
 
 import java.nio.file.Path;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -12,7 +14,7 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 
 public class PhotoServer {
 	
-	private static final Logger LOGGER = Logger.getLogger(PhotoServer.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServer.class.getName());
 
 	private final String host;
 	

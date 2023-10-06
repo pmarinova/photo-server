@@ -1,12 +1,8 @@
 package pm.photos.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -14,29 +10,16 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PhotoServerApp {
 	
-	private static Logger LOGGER = configureLogger();
-	
-	private static Logger configureLogger() {
-		// See https://stackoverflow.com/a/13825590
-        System.setProperty("java.util.logging.manager", CustomLogManager.class.getName());
-		try (InputStream config = PhotoServerApp.class.getResourceAsStream("/logging.properties")) {
-			LogManager.getLogManager().readConfiguration(config);
-			return Logger.getLogger(PhotoServerApp.class.getName());
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to configure logger", e);
-		}
+	static {
+		System.setProperty("org.jboss.logging.provider", "slf4j");
 	}
 	
-	public static class CustomLogManager extends LogManager {
-        static CustomLogManager instance;
-        public CustomLogManager() { instance = this; }
-        @Override public void reset() { /* don't reset yet. */ }
-        private void reset0() { super.reset(); }
-        public static void resetFinally() { instance.reset0(); }
-    }
+	private static Logger LOGGER = LoggerFactory.getLogger(PhotoServerApp.class);
 
 	private final Path photosPath;
 	private final String serverHost;
@@ -86,13 +69,12 @@ public class PhotoServerApp {
 			photoServer.start();
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				LOGGER.log(Level.INFO, "Shutting down...");
-				try { photoServer.stop(); }
-				finally { CustomLogManager.resetFinally(); }
+				LOGGER.info("Shutting down...");
+				photoServer.stop();
 			}));
 			
 		} catch (ParseException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
+			LOGGER.error(e.getMessage());
 			new HelpFormatter().printHelp("photo-server", options, true);
 			System.exit(1);
 		}
@@ -106,19 +88,19 @@ public class PhotoServerApp {
 	
 	void start() {
 		try {
-			LOGGER.log(Level.INFO, String.format("Serving photos from path '%s'", photosPath.toAbsolutePath()));
+			LOGGER.info(String.format("Serving photos from path '%s'", photosPath.toAbsolutePath()));
 			
 			server = new PhotoServer(serverHost, serverPort);
 			server.setPhotosPath(photosPath);
 			server.start();
-			LOGGER.log(Level.INFO, String.format("Server started at %s:%d", serverHost, serverPort));
+			LOGGER.info(String.format("Server started at %s:%d", serverHost, serverPort));
 			
 			jmdns = new PhotoServerJmDNS(serverHost, serverPort);
 			jmdns.start();
-			LOGGER.log(Level.INFO, "mDNS service started");
+			LOGGER.info("mDNS service started");
 		}
 		catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
 	
@@ -126,16 +108,16 @@ public class PhotoServerApp {
 		try {
 			if (jmdns != null) {
 				jmdns.stop();
-				LOGGER.log(Level.INFO, "mDNS service stopped");
+				LOGGER.info("mDNS service stopped");
 			}
 			
 			if (server != null) {
 				server.stop();
-				LOGGER.log(Level.INFO, "Server stopped");
+				LOGGER.info("Server stopped");
 			}
 		}
 		catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
 }
