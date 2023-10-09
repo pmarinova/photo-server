@@ -17,6 +17,7 @@ public class PhotoServerApp {
 	
 	static {
 		System.setProperty("org.jboss.logging.provider", "slf4j");
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
 	}
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(PhotoServerApp.class);
