@@ -11,4 +11,6 @@
   <!--
   <arguments>-d <PHOTOS_DIR></arguments>
   -->
+  <startmode>Automatic</startmode>
+  <delayedAutoStart/>
 </service>
