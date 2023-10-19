@@ -24,7 +24,8 @@ public class PhotoServerJmDNS {
 		String serviceName = "photo-server";
 		String serviceDescription = "Photo server service";
 		ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceDescription);
-		jmdns = JmDNS.create(InetAddress.getByName(host));
+		InetAddress ipAddress = InetAddress.getByName(host);
+		jmdns = ipAddress.isAnyLocalAddress() ? JmDNS.create() : JmDNS.create(ipAddress);
 		jmdns.registerService(serviceInfo);
 	}
 
