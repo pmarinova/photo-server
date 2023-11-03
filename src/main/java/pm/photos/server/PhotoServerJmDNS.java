@@ -20,12 +20,12 @@ public class PhotoServerJmDNS {
 	}
 
 	public void start() throws IOException {
-		String serviceType = "_http._tcp.local";
-		String serviceName = "photo-server";
-		String serviceDescription = "Photo server service";
-		ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceDescription);
 		InetAddress ipAddress = InetAddress.getByName(host);
 		jmdns = ipAddress.isAnyLocalAddress() ? JmDNS.create() : JmDNS.create(ipAddress);
+		String serviceType = "_photo-server._tcp.local";
+		String serviceName = jmdns.getInetAddress().getHostName();
+		String serviceDescription = "Photo server service";
+		ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceDescription);
 		jmdns.registerService(serviceInfo);
 	}
 
