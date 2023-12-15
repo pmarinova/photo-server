@@ -1,20 +1,38 @@
 package pm.photos.server;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.accesslog.AccessLogHandler;
-import io.undertow.server.handlers.resource.PathResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
+import com.sun.net.httpserver.Filter;
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
 
 public class PhotoServer {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServer.class.getName());
+	
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
+	
+	private final Filter logFilter = Filter.afterHandler("logger", (e) -> {
+		LOGGER.info(String.format("%s - - [%s] \"%s %s %s\" %d %s", 
+				e.getRemoteAddress().getHostString(),
+				OffsetDateTime.now().format(FORMATTER),
+				e.getRequestMethod(), 
+				e.getRequestURI(),
+				e.getProtocol(),
+				e.getResponseCode(),
+				e.getResponseHeaders().getFirst("Content-length")));
+	});
 
 	private final String host;
 	
@@ -22,9 +40,10 @@ public class PhotoServer {
 	
 	private Path photosPath;
 	
-	private Undertow undertow;
+	private HttpServer httpServer;
+	private ExecutorService threadPool;
 	
-	public PhotoServer (String host, int port) {
+	public PhotoServer(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
@@ -34,33 +53,29 @@ public class PhotoServer {
 	}
 	
 	public void setPhotosPath(Path photosPath) {
-		this.photosPath = photosPath;
+		this.photosPath = photosPath.toAbsolutePath();
 	}
 	
-	public void start() {
+	public void start() throws IOException {
+		var socketAddress = new InetSocketAddress(host, port);
+		this.httpServer = HttpServer.create(socketAddress, 0);
 		
-		HttpHandler rootHandler = Handlers.path()
-				.addPrefixPath("/photos/list", new PhotoListHandler(this.photosPath))
-				.addPrefixPath("/photos", newPhotoResourceHandler(this.photosPath));
+		addHandler("/photos", SimpleFileServer.createFileHandler(this.photosPath));
+		addHandler("/photos/list", new PhotoListHandler(this.photosPath));
 		
-		HttpHandler logHandler = new AccessLogHandler(rootHandler,
-				message -> LOGGER.info(message), "common", PhotoServer.class.getClassLoader()); 
-		
-		this.undertow = Undertow.builder()
-			.addHttpListener(this.port, this.host)
-			.setHandler(logHandler)
-			.build();
-		
-		this.undertow.start();
+		this.threadPool = Executors.newFixedThreadPool(3);
+		this.httpServer.setExecutor(this.threadPool);
+		this.httpServer.start();
 	}
 	
 	public void stop() {
-		this.undertow.stop();
+		this.httpServer.stop(0);
+		this.threadPool.shutdown();
 	}
 	
-	private ResourceHandler newPhotoResourceHandler(Path photosPath) {
-		ResourceHandler handler = new ResourceHandler(new PathResourceManager(photosPath));
-		handler.setDirectoryListingEnabled(true);
-		return handler;
+	private HttpContext addHandler(String path, HttpHandler handler) {
+		var ctx = this.httpServer.createContext(path, handler);
+		ctx.getFilters().add(this.logFilter);
+		return ctx;
 	}
 }

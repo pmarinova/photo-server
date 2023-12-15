@@ -1,6 +1,10 @@
 package pm.photos.server;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -8,10 +12,8 @@ import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
 public class PhotoListHandler implements HttpHandler {
 	
@@ -25,15 +27,21 @@ public class PhotoListHandler implements HttpHandler {
 	}
 
 	@Override
-	public void handleRequest(HttpServerExchange exchange) throws Exception {
-		
+	public void handle(HttpExchange exchange) throws IOException {
 		List<String> photos = Files.walk(this.photosPath)
 				.filter(this::isImageFile)
 				.map(this::getRelativePath)
 				.collect(Collectors.toList());
-		
-		exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-		exchange.getResponseSender().send(GSON.toJson(photos));
+		send(exchange, GSON.toJson(photos));
+	}
+	
+	private void send(HttpExchange exchange, String response) throws IOException {
+		var bytes = response.getBytes(UTF_8);
+		exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+		exchange.sendResponseHeaders(200, bytes.length);
+		try (OutputStream os = exchange.getResponseBody()) {
+            os.write(bytes);
+        }
 	}
 
 	private boolean isImageFile(Path path) {
