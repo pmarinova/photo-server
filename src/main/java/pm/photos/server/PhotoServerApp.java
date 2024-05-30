@@ -98,7 +98,7 @@ public class PhotoServerApp {
 			
 			jmdns = new PhotoServerJmDNS(serverHost, serverPort);
 			jmdns.start();
-			LOGGER.info("mDNS service started");
+			LOGGER.info("mDNS service started at interface " + jmdns.getNetworkInterface().getDisplayName());
 		}
 		catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);

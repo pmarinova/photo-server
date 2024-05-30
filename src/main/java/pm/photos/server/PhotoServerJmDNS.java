@@ -2,6 +2,8 @@ package pm.photos.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Arrays;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -13,6 +15,8 @@ public class PhotoServerJmDNS {
 	private final int port;
 
 	private JmDNS jmdns;
+	
+	private NetworkInterface networkInterface;
 
 	public PhotoServerJmDNS(String host, int port) {
 		this.host = host;
@@ -24,8 +28,11 @@ public class PhotoServerJmDNS {
 		jmdns = ipAddress.isAnyLocalAddress() ? JmDNS.create() : JmDNS.create(ipAddress);
 		String serviceType = "_photo-server._tcp.local";
 		String serviceName = jmdns.getInetAddress().getHostName();
-		String serviceDescription = "Photo server service";
-		ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceDescription);
+		
+		networkInterface = NetworkInterface.getByInetAddress(jmdns.getInetAddress());
+		byte[] macAddress = networkInterface.getHardwareAddress();
+		
+		ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, "MAC=" + formatMACAddress(macAddress));
 		jmdns.registerService(serviceInfo);
 	}
 
@@ -34,5 +41,17 @@ public class PhotoServerJmDNS {
 			jmdns.unregisterAllServices();
 			jmdns.close();
 		}
+	}
+	
+	public NetworkInterface getNetworkInterface() {
+		return this.networkInterface;
+	}
+	
+	private static String formatMACAddress(byte[] mac) {
+		if (mac.length != 6) {
+			throw new IllegalArgumentException("Invalid MAC address: " + Arrays.toString(mac));
+		}
+		return String.format("%02x:%02x:%02x:%02x:%02x:%02x",
+				mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	}
 }
