@@ -1,6 +1,7 @@
 .classpath
 .settings
 .project
+dist
 target
 *.log
 *.log.lck
