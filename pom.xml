@@ -73,7 +73,7 @@
       <plugin>
         <groupId>org.graalvm.buildtools</groupId>
         <artifactId>native-maven-plugin</artifactId>
-        <version>0.9.27</version>
+        <version>0.10.2</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -85,9 +85,6 @@
           </execution>
         </executions>
         <configuration>
-          <metadataRepository>
-            <enabled>true</enabled>
-          </metadataRepository>
           <buildArgs>
             <arg>-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver</arg>
             <arg>--install-exit-handlers</arg>
