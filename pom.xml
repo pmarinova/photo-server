@@ -113,6 +113,7 @@
             <enabled>true</enabled>
           </metadataRepository>
           <buildArgs>
+            <arg>-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver</arg>
             <arg>--install-exit-handlers</arg>
           </buildArgs>
         </configuration>
