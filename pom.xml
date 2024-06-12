@@ -104,6 +104,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <outputDirectory>${distDir}</outputDirectory>
               <finalName>${project.artifactId}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <attach>false</attach>
