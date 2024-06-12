@@ -75,21 +75,6 @@
         <artifactId>native-maven-plugin</artifactId>
         <version>0.10.2</version>
         <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>build-native</id>
-            <goals>
-              <goal>compile-no-fork</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-        <configuration>
-          <buildArgs>
-            <arg>-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver</arg>
-            <arg>--install-exit-handlers</arg>
-          </buildArgs>
-        </configuration>
       </plugin>
       
       <plugin>
@@ -132,9 +117,45 @@
   </build>
   
   <profiles>
+    
     <profile>
-      <id>windows</id>
+      <id>native</id>
       <activation>
+        <property>
+          <name>dist-native</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build-native</id>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <buildArgs>
+                <arg>-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver</arg>
+                <arg>--install-exit-handlers</arg>
+              </buildArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+      
+    <profile>
+      <id>native-windows</id>
+      <activation>
+        <property>
+          <name>dist-native</name>
+        </property>
         <os>
           <family>windows</family>
         </os>
