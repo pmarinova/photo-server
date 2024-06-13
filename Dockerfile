@@ -20,5 +20,5 @@ EXPOSE 40003
 
 # Copy the native executable into the container
 COPY --from=builder /build/target/photo-server photo-server
-COPY --from=builder /build/photos photos
+COPY photos photos
 ENTRYPOINT ["/photo-server"]
