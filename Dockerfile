@@ -5,7 +5,10 @@ FROM container-registry.oracle.com/graalvm/native-image:21-ol9 AS builder
 WORKDIR /build
 
 # Copy the source code into the image for building
-COPY . /build
+COPY src ./src
+COPY .mvn ./.mvn
+COPY mvnw .
+COPY pom.xml .
 
 # Build
 RUN ./mvnw --no-transfer-progress native:compile -Pnative
