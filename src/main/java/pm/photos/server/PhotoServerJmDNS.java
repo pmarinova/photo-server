@@ -3,6 +3,7 @@ package pm.photos.server;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import javax.jmdns.JmDNS;
@@ -27,7 +28,7 @@ public class PhotoServerJmDNS {
 		InetAddress ipAddress = InetAddress.getByName(host);
 		jmdns = ipAddress.isAnyLocalAddress() ? JmDNS.create() : JmDNS.create(ipAddress);
 		String serviceType = "_photo-server._tcp.local";
-		String serviceName = jmdns.getInetAddress().getHostName();
+		String serviceName = getHostName();
 		
 		networkInterface = NetworkInterface.getByInetAddress(jmdns.getInetAddress());
 		byte[] macAddress = networkInterface.getHardwareAddress();
@@ -45,6 +46,22 @@ public class PhotoServerJmDNS {
 	
 	public NetworkInterface getNetworkInterface() {
 		return this.networkInterface;
+	}
+	
+	private String getHostName() {
+		String hostname = System.getenv("COMPUTERNAME"); // Windows
+		if (hostname != null)
+			return hostname;
+		
+        hostname = System.getenv("HOSTNAME"); // Unix/Linux
+        if (hostname != null)
+        	return hostname;
+        
+        try {
+        	return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+        	return "UNKNOWN_HOST";
+        }
 	}
 	
 	private static String formatMACAddress(byte[] mac) {
