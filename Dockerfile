@@ -16,7 +16,8 @@ RUN ./mvnw --no-transfer-progress native:compile -Pnative
 # The deployment image
 FROM container-registry.oracle.com/os/oraclelinux:9-slim
 
-EXPOSE 40003
+EXPOSE 40003/tcp
+EXPOSE 5353/udp
 
 # Copy the native executable into the container
 COPY --from=builder /build/target/photo-server photo-server
