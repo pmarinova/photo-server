@@ -21,5 +21,8 @@ EXPOSE 5353/udp
 
 # Copy the native executable into the container
 COPY --from=builder /build/target/photo-server photo-server
+
+# Copy the default photos directory
 COPY photos photos
+
 ENTRYPOINT ["/photo-server"]
