@@ -1,5 +1,5 @@
 # Using Oracle GraalVM for JDK 21
-FROM container-registry.oracle.com/graalvm/native-image:21-ol9 AS builder
+FROM container-registry.oracle.com/graalvm/native-image:21-muslib AS builder
 
 # Set the working directory
 WORKDIR /build
@@ -11,10 +11,10 @@ COPY mvnw .
 COPY pom.xml .
 
 # Build
-RUN ./mvnw --no-transfer-progress native:compile -Pnative
+RUN ./mvnw --no-transfer-progress native:compile -Pnative -Dlibc-musl
 
 # The deployment image
-FROM container-registry.oracle.com/os/oraclelinux:9-slim
+FROM scratch
 
 EXPOSE 40003/tcp
 EXPOSE 5353/udp
