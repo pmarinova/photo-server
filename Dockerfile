@@ -13,6 +13,15 @@ COPY pom.xml .
 # Build
 RUN ./mvnw --no-transfer-progress native:compile -Pnative -Dlibc-musl
 
+# Setup UPX
+RUN microdnf install wget xz
+COPY setup-upx.sh .
+RUN chmod +x setup-upx.sh
+RUN bash setup-upx.sh
+
+# Create a compressed version of the executable
+RUN ./upx --lzma --best target/photo-server -o target/photo-server.upx
+
 # The deployment image
 FROM scratch
 
@@ -20,7 +29,7 @@ EXPOSE 40003/tcp
 EXPOSE 5353/udp
 
 # Copy the native executable into the container
-COPY --from=builder /build/target/photo-server photo-server
+COPY --from=builder /build/target/photo-server.upx photo-server
 
 # Copy the default photos directory
 COPY photos photos
