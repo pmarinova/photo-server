@@ -2,6 +2,12 @@
 
 Simple photo server used by [Android photo screensaver](https://github.com/pmarinova/android-photo-screensaver) for TV.
 
+The photo server takes a directory containing JPEG images and exposes two endpoints:
+- **/photos/list** - returns a flat list of all photos found in the photos directory with their relative paths
+- **/photos** - serves the files from the photos directory
+
+The photo screensaver loads the list of photos from `/photos/list` and then displays a random photo by loading it from `/photos/{PHOTO_RELATIVE_PATH}`.
+
 ## How to build
 
 The photo server is compiled to a native image with GraalVM.
@@ -40,7 +46,7 @@ photo-server \
 -p 40003
 ```
 
-By default, the photo-server image contains a default photos directory. To specify a photos directory from the host, you should mount it to /photos:
+The photo-server image contains a default photos directory. To specify a photos directory from the host, you should mount it to /photos:
 
 ```
 docker run -d \
