@@ -12,7 +12,7 @@ The photo screensaver loads the list of photos from `/photos/list` and then disp
 
 The photo server is compiled to a native image with GraalVM.
 To build the native image you need to set JAVA_HOME to the GraalVM distribution and install the
-required [prerequisites](https://www.graalvm.org/22.0/reference-manual/native-image/#prerequisites):
+required [prerequisites](https://www.graalvm.org/latest/reference-manual/native-image/#prerequisites):
 
 ```
 SET "JAVA_HOME=<path-to-graalvm-jdk-21>"
