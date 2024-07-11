@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'application'
 }
 
 repositories {
@@ -7,11 +7,11 @@ repositories {
 }
 
 dependencies {
-    api libs.com.google.code.gson.gson
-    api libs.org.jmdns.jmdns
-    api libs.commons.cli.commons.cli
-    api libs.org.slf4j.slf4j.api
-    api libs.org.slf4j.slf4j.simple
+    implementation libs.com.google.code.gson.gson
+    implementation libs.org.jmdns.jmdns
+    implementation libs.commons.cli.commons.cli
+    implementation libs.org.slf4j.slf4j.api
+    implementation libs.org.slf4j.slf4j.simple
 }
 
 java {
@@ -26,4 +26,8 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'pm.photos.server.PhotoServerApp'
 }
