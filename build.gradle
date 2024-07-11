@@ -14,6 +14,10 @@ dependencies {
     implementation libs.org.slf4j.slf4j.simple
 }
 
+application {
+    mainClass = 'pm.photos.server.PhotoServerApp'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -26,8 +30,4 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
-}
-
-application {
-    mainClass = 'pm.photos.server.PhotoServerApp'
 }
