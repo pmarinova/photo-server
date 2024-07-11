@@ -1,6 +1,3 @@
-.classpath
-.settings
-.project
 dist
 target
 *.log
@@ -11,3 +8,9 @@ target
 
 # Ignore Gradle build output directory
 build
+
+# Ignore Eclipse project files and output folder
+.classpath
+.settings
+.project
+bin
