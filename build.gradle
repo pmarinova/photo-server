@@ -32,3 +32,12 @@ tasks.withType(JavaCompile) {
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
+
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add("-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver")
+            buildArgs.add("--install-exit-handlers")
+        }
+    }
+}
