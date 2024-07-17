@@ -33,11 +33,20 @@ tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
 
+def nativeImageBuildArgs = [
+    '-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver',
+    '--install-exit-handlers'
+]
+
+if (hasProperty('static')) {
+    nativeImageBuildArgs.add('--static')
+    nativeImageBuildArgs.add('--libc=musl')
+}
+
 graalvmNative {
     binaries {
         main {
-            buildArgs.add("-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver")
-            buildArgs.add("--install-exit-handlers")
+            buildArgs.addAll(nativeImageBuildArgs)
         }
     }
 }
