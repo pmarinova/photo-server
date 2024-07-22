@@ -16,17 +16,19 @@ required [prerequisites](https://www.graalvm.org/latest/reference-manual/native-
 
 ```
 SET "JAVA_HOME=<path-to-graalvm-jdk-21>"
-mvn package -Pnative
+./gradlew nativeCompile
 ```
 
 ### Building and running a native image with Docker
 
 Build the container image:
+
 ```
 docker build -t photo-server .
 ```
 
 Run the image:
+
 ```
 docker run -d \
 -p 40003:40003/tcp \
@@ -59,12 +61,12 @@ photo-server
 
 ### Building a native image and running as a service on Windows
 
-You can also build a native executable and wrap it as a Windows service:
+On Windows, you can also build a native executable and wrap it as a Windows service:
 
 ```
 SET "JAVA_HOME=<path-to-graalvm-jdk-21>"
-mvn package -Ddist-native
+.\gradlew.bat assembleWinswDist
 ```
 
-On Windows, this will build a native win32 executable and package it with
-[Windows Service Wrapper](https://github.com/winsw/winsw).
+The 'assembleWinswDist' task will build a native win32 executable 
+and package it with [Windows Service Wrapper](https://github.com/winsw/winsw).
