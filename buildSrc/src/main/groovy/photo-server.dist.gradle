@@ -1,0 +1,27 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+    id 'distribution'
+}
+
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    distributions {
+        winsw {
+            contents {
+                from(nativeCompile.outputFile)
+                from('service/windows')
+                from('.') {
+                    include('photos/**')
+                }
+            }
+        }
+    }
+}
+
+def distArchiveType = Os.isFamily(Os.FAMILY_WINDOWS) ? 'zip' : 'tar'
+gradle.taskGraph.whenReady {
+    graph -> {
+        graph.allTasks.findAll { it.name ==~ /(?i).*dist(tar|zip)/ }*.enabled = false
+        graph.allTasks.findAll { it.name ==~ /(?i).*dist$distArchiveType/ }*.enabled = true
+    }
+}

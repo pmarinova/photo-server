@@ -1,9 +1,7 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 plugins {
     id 'application'
-    id 'distribution'
-    id 'org.graalvm.buildtools.native' version '0.10.2'
+    id 'photo-server.native'
+    id 'photo-server.dist'
 }
 
 repositories {
@@ -34,44 +32,4 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
-}
-
-def nativeImageBuildArgs = [
-    '-H:IncludeResourceBundles=sun.net.httpserver.simpleserver.resources.simpleserver',
-    '--install-exit-handlers'
-]
-
-if (hasProperty('static')) {
-    nativeImageBuildArgs.add('--static')
-    nativeImageBuildArgs.add('--libc=musl')
-}
-
-graalvmNative {
-    binaries {
-        main {
-            buildArgs.addAll(nativeImageBuildArgs)
-        }
-    }
-}
-
-if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    distributions {
-        winsw {
-            contents {
-                from(nativeCompile.outputFile)
-                from('service/windows')
-                from('.') {
-                    include('photos/**')
-                }
-            }
-        }
-    }
-}
-
-def distArchiveType = Os.isFamily(Os.FAMILY_WINDOWS) ? 'zip' : 'tar'
-gradle.taskGraph.whenReady {
-    graph -> {
-        graph.allTasks.findAll { it.name ==~ /(?i).*dist(tar|zip)/ }*.enabled = false
-        graph.allTasks.findAll { it.name ==~ /(?i).*dist$distArchiveType/ }*.enabled = true
-    }
 }
