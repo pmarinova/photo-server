@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'distribution'
     id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
@@ -47,6 +48,18 @@ graalvmNative {
     binaries {
         main {
             buildArgs.addAll(nativeImageBuildArgs)
+        }
+    }
+}
+
+distributions {
+    winsw {
+        contents {
+            from(nativeCompile.outputFile)
+            from('service/windows')
+            from('.') {
+                include('photos/**')
+            }
         }
     }
 }
