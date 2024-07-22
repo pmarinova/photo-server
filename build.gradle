@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     id 'application'
     id 'distribution'
@@ -52,13 +54,15 @@ graalvmNative {
     }
 }
 
-distributions {
-    winsw {
-        contents {
-            from(nativeCompile.outputFile)
-            from('service/windows')
-            from('.') {
-                include('photos/**')
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    distributions {
+        winsw {
+            contents {
+                from(nativeCompile.outputFile)
+                from('service/windows')
+                from('.') {
+                    include('photos/**')
+                }
             }
         }
     }
