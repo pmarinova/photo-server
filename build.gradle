@@ -67,3 +67,11 @@ if (Os.isFamily(Os.FAMILY_WINDOWS)) {
         }
     }
 }
+
+def distArchiveType = Os.isFamily(Os.FAMILY_WINDOWS) ? 'zip' : 'tar'
+gradle.taskGraph.whenReady {
+    graph -> {
+        graph.allTasks.findAll { it.name ==~ /(?i).*dist(tar|zip)/ }*.enabled = false
+        graph.allTasks.findAll { it.name ==~ /(?i).*dist$distArchiveType/ }*.enabled = true
+    }
+}
